@@ -1,4 +1,4 @@
-name: Build APK
+name: Build Kivy APK
 
 on:
   workflow_dispatch:
@@ -8,42 +8,46 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
 
       - name: Install system dependencies
         run: |
           sudo apt update
           sudo apt install -y \
-            git zip unzip autoconf libtool pkg-config \
+            git zip unzip autoconf libtool libtool-bin pkg-config \
             zlib1g-dev libncurses5-dev libncursesw5-dev \
             cmake libffi-dev libssl-dev automake
 
-      - name: Install Buildozer
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Upgrade pip
         run: |
-          python -m pip install --upgrade pip
-          pip install buildozer
+          python -m pip install --upgrade pip setuptools wheel
+
+      - name: Install Buildozer and Cython
+        run: |
+          pip install buildozer cython==0.29.36
+
+      - name: Check files
+        run: |
+          echo "Files in repository:"
+          ls -la
+          echo "Buildozer version:"
+          buildozer --version
 
       - name: Build APK
         run: |
-          yes | buildozer android debug
+          buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: ecommerce-manager-apk
+          name: E_M-apk
           path: bin/*.apk
