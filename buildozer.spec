@@ -9,7 +9,7 @@ source.include_exts = py,png,jpg,jpeg,kv,atlas,ttf
 
 version = 1.0
 
-requirements = python3==3.11.9,kivy
+requirements = python3,kivy
 
 orientation = portrait
 
